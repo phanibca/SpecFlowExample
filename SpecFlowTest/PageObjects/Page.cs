@@ -7,7 +7,7 @@ using OpenQA.Selenium;
 
 namespace SpecFlowTest.PageObjects
 {
-    class Page
+    public class Page
     {
         protected readonly IWebDriver _driver;
 
