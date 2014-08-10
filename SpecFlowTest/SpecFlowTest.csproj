@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Drawing" />
     <Reference Include="TechTalk.SpecFlow">
       <HintPath>..\packages\SpecFlow.1.9.0\lib\net35\TechTalk.SpecFlow.dll</HintPath>
@@ -61,16 +62,20 @@
   </Choose>
   <ItemGroup>
     <Compile Include="FeatureFiles\LanguageChange.feature.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>LanguageChange.feature</DependentUpon>
+      <SubType>Code</SubType>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="FeatureFiles\Login.feature.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Login.feature</DependentUpon>
     </Compile>
-    <Compile Include="StepDefinations\LanguageChangeSteps.cs" />
+    <Compile Include="Helpers\ConfigSettings.cs" />
+    <Compile Include="PageObjects\PreferencesPage.cs" />
+    <Compile Include="StepDefinations\General.StepDefinations.cs" />
+    <Compile Include="StepDefinations\LanguageChange.StepDefination.cs" />
     <Compile Include="PageObjects\HomePage.cs" />
     <Compile Include="PageObjects\LoginPage.cs" />
     <Compile Include="PageObjects\Page.cs" />

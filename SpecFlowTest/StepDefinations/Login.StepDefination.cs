@@ -1,66 +1,29 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
-using SpecFlowTest.PageObjects;
 using TechTalk.SpecFlow;
+using SpecFlowTest.Helpers;
 
 namespace SpecFlowTest.StepDefinations
 {
-    [Binding]
-    public class LoginSteps
+   public partial class StepDefinations
     {
 
-        protected IWebDriver _driver;
-
-        #region properties
-
-        LoginPage LoginPage
+        private string _appUrl;
+        [Given(@"I have '(.*)' opened")]
+        public void GivenIHaveOpened(string url)
         {
-            get
-            {
-                return new LoginPage(_driver);
-            }
+            _appUrl = ConfigSettings.GetKeyValue(url);
         }
 
-        #endregion
-
-        #region before/after scenario
-        [BeforeScenario]
-        public void BeforeScenario()
-        {
-            _driver = new  FirefoxDriver();
-            //_driver = new ChromeDriver();
-            _driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(16));
-            _driver.Manage().Window.Maximize();
-        }
-
-
-
-
-        [AfterScenario]
-        public void AfterScenario()
-        {
-            _driver.Close();
-            _driver.Dispose();
-        }
-        #endregion
-
-        [Given(@"I have the url '(.*)' opened")]
-        public void GivenIHaveTheUrlOpened(string url)
-        {
-            _driver.Navigate().GoToUrl(url);
-        }
-
-        [When(@"'(.*)' is logged in")]
+       [When(@"'(.*)' is logged in")]
         public void WhenIsLoggedIn(string uid)
-        {
-            LoginPage.UserID.SendKeys(uid);
-            LoginPage.Password.SendKeys(uid);
-            LoginPage.ButtonOK.Click();
-            Thread.Sleep(1000);
+       {
+           var userId = ConfigSettings.GetKeyValue(uid);
+           ScenarioContext.Current.Add("UserId",userId);
+           DoLogin(_appUrl, userId, userId);
         }
 
         [Then(@"PageTitle should be '(.*)'")]
@@ -69,5 +32,24 @@ namespace SpecFlowTest.StepDefinations
             Assert.AreEqual("Home", _driver.Title);
             
         }
+
+        [Then(@"only valid widgets should be visible")]
+        public void ThenOnlyValidWidgetsShouldBeVisible()
+        {
+            var userId = ScenarioContext.Current.Get<string>("UserId");
+            var validWidgets = ConfigSettings.GetKeyValue(string.Concat(userId, "_Widgets"));
+            var widgetsList = validWidgets.Split(';').ToList<string>();
+            var availableWidgets = _homePage.GetAllAvailableWidgets();
+            if(widgetsList.Count!=availableWidgets.Count)
+                Assert.Fail();
+
+            var difference = widgetsList.Intersect(availableWidgets.Select(s => s.Text)).ToList();
+            if (difference.Count == widgetsList.Count)
+                Assert.IsTrue(true);
+            else
+                Assert.Fail();
+        }
+
+
     }
 }
